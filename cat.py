@@ -1,6 +1,66 @@
 import json
 import sys
 
+
+class Notebook:
+	def __init__(self, path):
+		
+		self.path = path 
+
+	def __getitem__(self, index):
+		
+		gcell = []
+
+		with open(self.path) as notebook:
+			notebook_str = notebook.read()
+			notebook_json = json.loads(notebook_str)
+			cells = notebook_json['cells']
+			gcell.append(cells[index - 1])
+			del notebook_json['cells']
+
+		cell = {}
+		cell['cells'] = gcell
+		cell.update(notebook_json)
+		cell_str = json.dumps(cell) 
+
+		with open('get_cell.ipynb', 'w') as get_cell:
+			get_cell.write(cell_str)
+
+	def __add__(self, another):
+		
+		with open(self.path) as notebook1:
+			notebook1_str = notebook1.read()
+			notebook1_json = json.loads(notebook1_str)
+			cells1 = notebook1_json['cells']
+
+			del notebook1_json['cells']
+
+		with open(another.path) as notebook2:
+			notebook2_str = notebook2.read()
+			notebook2_json = json.loads(notebook2_str)
+			cells2 = notebook2_json['cells']
+
+		target_cell = cells1 + cells2
+		target_notebook = {}
+
+		target_notebook['cells'] = target_cell
+		target_notebook.update(notebook1_json)
+
+		target_str = json.dumps(target_notebook)
+
+		with open('target_notebook.ipynb', 'w') as target:
+			target.write(target_str)
+
+
+notebook1 = Notebook('1.ipynb')
+notebook4 = Notebook('4.ipynb')
+
+notebook4[2]
+notebook1 + notebook4 
+
+
+
+'''
 #handle argument exceptions
 if len(sys.argv) < 3:
 	raise Exception('参数数量必须大于2')
@@ -46,3 +106,4 @@ target_str = json.dumps(target_notebook)
 
 with open('target_notebook.ipynb', 'w') as target:
 	target.write(target_str)
+'''
